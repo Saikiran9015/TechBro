@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Login | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+  <div class="card" style="width: 400px; max-width: 100%;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <i class="fas fa-seedling fa-3x text-primary mb-4"></i>
+      <h2>Welcome Back</h2>
+      <p class="text-muted">Login to access your agricultural hub</p>
+    </div>
+
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div style="position: relative;">
+          <i class="fas fa-envelope" style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+          <input type="email" name="email" class="form-control" style="padding-left: 2.5rem;"
+            placeholder="farmer@kropkart.com" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div style="position: relative;">
+          <i class="fas fa-key" style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+          <input type="password" name="password" class="form-control" style="padding-left: 2.5rem;"
+            placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+        Secure Login <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <p class="text-muted" style="font-size: 0.9rem;">New to KropKart? <a href="/register"
+          class="text-primary font-bold">Create Account</a></p>
+      <!-- <p class="mt-4"><a href="/forgot" class="text-muted" style="font-size: 0.85rem;">Forgot password?</a></p> -->
+    </div>
+  </div>
+</div>
+{% endblock %}

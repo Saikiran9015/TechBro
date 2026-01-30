@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>KropKart Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #2f7d32;
+            --yellow: #ffb703;
+            --dark-green: #166534;
+            --white: #ffffff;
+            --muted: #f2f7f1;
+            --text: #13321f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--muted);
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--dark-green);
+            color: var(--white);
+            padding: 20px;
+            position: fixed;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--green);
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            padding: 25px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header h2 {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .user-box {
+            background: var(--white);
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+        }
+
+        /* DASHBOARD CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(22, 101, 52, 0.04);
+        }
+
+        .card h3 {
+            font-size: 22px;
+            color: var(--green);
+        }
+
+        .card p {
+            margin-top: 6px;
+            color: #666;
+        }
+
+        /* TABLE */
+        .table-section {
+            margin-top: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: rgba(47, 125, 50, 0.05);
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .success {
+            background: #4caf50;
+        }
+
+        .pending {
+            background: var(--yellow);
+        }
+
+        .cancel {
+            background: #e53935;
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% if session.get('user_type') != 'admin' %}
+    <div style="padding:48px; text-align:center;">
+        <h2 style="color:var(--dark-green);">Access Denied</h2>
+        <p style="color:#666;">You must be an admin to view this page.</p>
+        <a href="/dashboard" style="color:var(--green); font-weight:600;">Return to Dashboard</a>
+    </div>
+    {% else %}
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">🌿 KropKart</div>
+        <a href="/admin" class="nav-item active">Dashboard</a>
+        <a href="/admin/products" class="nav-item">Products</a>
+        <a href="/admin/orders" class="nav-item">Orders</a>
+        <a href="/admin/customers" class="nav-item">Customers</a>
+        <a href="/admin/payments" class="nav-item">Payments</a>
+        <a href="/admin/analytics" class="nav-item">Analytics</a>
+        <a href="/admin/settings" class="nav-item">Settings</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div class="header">
+            <h2>Dashboard Overview</h2>
+            <div class="user-box">{{ session.get('name', 'Admin') }}</div>
+            <div id="google_translate_element"></div>
+        </div>
+
+        <!-- STATS -->
+        <div class="cards">
+            <div class="card">
+                <h3>₹ 2,45,000</h3>
+                <p>Total Revenue</p>
+            </div>
+            <div class="card">
+                <h3>1,284</h3>
+                <p>Total Orders</p>
+            </div>
+            <div class="card">
+                <h3>345</h3>
+                <p>Active Products</p>
+            </div>
+            <div class="card">
+                <h3>129</h3>
+                <p>New Users</p>
+            </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="table-section">
+            <h3>Recent Orders</h3>
+            <table>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>#{{ order._id|string | truncate(6, True, '') }}</td>
+                    <td>{{ order.user }}</td>
+                    <td>{{ order.product_id | truncate(10) }}</td>
+                    <td>₹{{ (order.amount / 100) }}</td>
+                    <td>
+                        {% if order.status == 'paid' %}
+                        <span class="status success">Paid</span>
+                        {% elif order.status == 'Refunded' %}
+                        <span class="status cancel">Refunded</span>
+                        {% else %}
+                        <span class="status pending">{{ order.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if order.status == 'paid' %}
+                        <a href="/admin/refund_order/{{ order._id }}"
+                            onclick="return confirm('Are you sure you want to refund this order? This action is irreversible.')"
+                            style="color: #dc2626; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                            <i class="fas fa-undo"></i> Refund
+                        </a>
+                        {% else %}
+                        <span style="color: #9ca3af;">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+
+</html>

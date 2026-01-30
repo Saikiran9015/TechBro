@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Marketplace | Agricultural Hub{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <!-- Header Section -->
+    <div style="margin-bottom: 3rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 2rem;">
+        <h1
+            style="font-size: 2.8rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: -0.025em;">
+            Global Agricultural Marketplace</h1>
+        <p class="text-muted" style="font-size: 1.15rem; color: #64748b;">Discover fresh produce and industrial farming
+            equipment verified by our quality standards.</p>
+    </div>
+
+    <!-- Filters & Search Bar -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 300px; position: relative;">
+            <i class="fas fa-search"
+                style="position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+            <input type="text" class="form-control"
+                style="padding: 0.875rem 1.25rem 0.875rem 3.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #f8fafc; width: 100%; font-size: 1rem;"
+                placeholder="Search for wheat, rice, tractors...">
+        </div>
+        <div style="position: relative;">
+            <select class="form-control"
+                style="padding: 0.875rem 2.5rem 0.875rem 1.25rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #ffffff; min-width: 180px; appearance: none; cursor: pointer; font-size: 1rem; font-weight: 500;">
+                <option>All Categories</option>
+                <option>Cereals</option>
+                <option>Fruits</option>
+                <option>Vegetables</option>
+                <option>Machinery</option>
+            </select>
+            <i class="fas fa-chevron-down"
+                style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: #64748b; pointer-events: none; font-size: 0.8rem;"></i>
+        </div>
+        <button class="btn"
+            style="background: #166534; color: white; padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; transition: all 0.2s;">
+            Filter Results
+        </button>
+    </div>
+
+    <!-- Listings Grid -->
+    {% if products %}
+    <div class="grid-cols-auto"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2.5rem;">
+        {% for product in products %}
+        <div class="card"
+            style="background: white; border-radius: 1.5rem; padding: 1.25rem; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04); transition: transform 0.3s ease;">
+            <div
+                style="height: 260px; border-radius: 1.2rem; overflow: hidden; margin-bottom: 1.5rem; position: relative; background: #f1f5f9;">
+                {% if product.image %}
+                <img src="{{ product.image }}"
+                    style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
+                    alt="{{ product.name }}" onmouseover="this.style.transform='scale(1.1)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <i class="fas fa-seedling fa-4x" style="color: #cbd5e1;"></i>
+                </div>
+                {% endif %}
+
+                <!-- Premium Quality Badge -->
+                <div
+                    style="position: absolute; top: 1rem; right: 1rem; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 0.6rem 0.9rem; border-radius: 0.875rem; font-weight: 700; font-size: 0.8rem; display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fas fa-check-circle" style="color: #22c55e;"></i> Verified: {{ product.rating }}
+                    </div>
+                    <div style="font-size: 0.7rem; color: #22c55e; text-transform: uppercase; letter-spacing: 0.05em;">
+                        {{ product.quality_label }}
+                    </div>
+                </div>
+
+                {% if session.get('user_type') == 'admin' or product.owner == session.get('user') %}
+                <div style="position: absolute; top: 1rem; left: 1rem; z-index: 10;">
+                    <a href="/delete_product/{{ product._id }}" class="btn"
+                        onclick="return confirm('Are you sure you want to delete this product?')"
+                        style="background: rgba(220, 38, 38, 0.9); color: white; padding: 0.5rem 0.8rem; font-size: 0.8rem; border-radius: 0.75rem; font-weight: 700; border: none; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <h3 style="font-size: 1.4rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">{{ product.name }}
+            </h3>
+            <span
+                style="display: inline-block; padding: 0.35rem 0.85rem; background: #f0fdf4; color: #166534; border-radius: 0.6rem; font-size: 0.85rem; font-weight: 700; margin-bottom: 1.25rem;">
+                {{ product.category }}
+            </span>
+
+            <p
+                style="color: #64748b; font-size: 1rem; line-height: 1.6; margin-bottom: 1.75rem; height: 3.2rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
+                {{ product.description }}
+            </p>
+
+            <div
+                style="padding-top: 1.5rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span
+                        style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Price
+                        & Stock</span>
+                    <span style="font-size: 1.85rem; font-weight: 900; color: #166534;">
+                        {% if product.owner_type == 'farmer' %}
+                        ₹{{ (product.adjusted_price or product.price) | round(2) }}/kg
+                        {% else %}
+                        ₹{{ product.adjusted_price or product.price }}/unit
+                        {% endif %}
+                    </span>
+                    {% if product.quantity is defined %}
+                    {% if product.quantity > 0 %}
+                    <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">
+                        {{ product.quantity }} {{ 'kg' if product.owner_type == 'farmer' else 'units' }} left
+                    </div>
+                    {% else %}
+                    <div style="font-size: 0.85rem; color: #dc2626; font-weight: 700; text-transform: uppercase;">Out of
+                        Stock</div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if session.get('user') %}
+                {% if product.quantity is defined and product.quantity <= 0 %} <button class="btn" disabled
+                    style="background: #cbd5e1; color: #64748b; padding: 0.85rem 1.75rem; border-radius: 0.875rem; font-weight: 700; border: none; cursor: not-allowed;">
+                    Check Back Later
+                    </button>
+                    {% else %}
+                    <a href="/checkout/{{ product._id }}" class="btn"
+                        style="background: #166534; color: #ffffff; padding: 0.85rem 1.75rem; border-radius: 0.875rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.2);">
+                        Buy Now
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <a href="/login" class="btn"
+                        style="background: #166534; color: #ffffff; padding: 0.85rem 1.75rem; border-radius: 0.875rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.2);">
+                        Login to Buy
+                    </a>
+                    {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State (Matches Image Perfectly) -->
+    <div
+        style="text-align: center; padding: 8rem 2rem; border: 2px dashed #e2e8f0; border-radius: 2rem; background: #ffffff; margin-bottom: 4rem;">
+        <div style="margin-bottom: 2rem;">
+            <i class="fas fa-search fa-6x" style="color: #64748b; opacity: 0.3;"></i>
+        </div>
+        <h3 style="font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 1rem;">No products found</h3>
+        <p style="color: #64748b; font-size: 1.25rem; max-width: 500px; margin: 0 auto; line-height: 1.6;">Try adjusting
+            your filters or search terms.</p>
+    </div>
+    {% endif %}
+
+    <!-- Newsletter Banner (Matches Image Footer) -->
+    <div
+        style="margin-top: 8rem; padding: 5rem; background: #000000; border-radius: 2.5rem; color: white; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);">
+        <div style="max-width: 600px;">
+            <h2
+                style="color: white; font-size: 2.75rem; font-weight: 900; margin-bottom: 1.25rem; letter-spacing: -0.025em; line-height: 1.1;">
+                Don't miss the next harvest</h2>
+            <p style="color: #94a3b8; font-size: 1.25rem; line-height: 1.7;">Join 50,000+ stakeholders receiving
+                real-time market updates.</p>
+        </div>
+        <div style="display: flex; gap: 1.25rem; flex: 1; min-width: 320px; justify-content: flex-end;">
+            <input type="email" class="form-control"
+                style="background: #1e293b; border: 1px solid #334155; color: white; padding: 1.25rem 1.75rem; border-radius: 1rem; flex: 1; max-width: 400px; font-size: 1.1rem;"
+                placeholder="Email address">
+            <button class="btn"
+                style="background: #166534; color: white; padding: 1.25rem 2.5rem; border-radius: 1rem; font-weight: 800; font-size: 1.1rem; border: none; cursor: pointer; transition: all 0.2s;">
+                Subscribe
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn:hover {
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #166534 !important;
+        box-shadow: 0 0 0 4px rgba(22, 101, 52, 0.1);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KropKart Seller Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --green: #2f7d32;
+    --yellow: #ffb703;
+    --dark-green: #166534;
+    --white: #ffffff;
+    --muted: #f2f7f1;
+    --text: #13321f;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:var(--muted);
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  background:var(--dark-green);
+  min-height:100vh;
+  padding:20px;
+  color:var(--white);
+}
+
+.logo{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:30px;
+}
+
+.nav-item{
+  padding:12px 15px;
+  border-radius:8px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.nav-item:hover,
+.nav-item.active{
+  background:var(--green);
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:30px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+
+.header h2{
+  font-weight:600;
+  color:var(--text);
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--text);
+}
+
+.profile img{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+}
+
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+.stat-card{
+  background:var(--white);
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.06);
+  border:1px solid rgba(22,101,52,0.04);
+}
+
+.stat-card h3{
+  font-size:22px;
+  color:var(--green);
+}
+
+.stat-card p{
+  color:#666;
+}
+
+/* TABLE */
+.table-section{
+  margin-top:40px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:var(--white);
+  border-radius:10px;
+  overflow:hidden;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+
+th{
+  background:rgba(47,125,50,0.05);
+  color:var(--green);
+  font-weight:600;
+}
+
+.status{
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:13px;
+  color:white;
+}
+
+.active{background:#4caf50;}
+.pending{background:var(--yellow);}
+.out{background:#f44336;}
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+}
+</style>
+</head>
+
+<body>
+
+{% if session.get('user_type') not in ['farmer', 'admin'] %}
+  <div style="padding:48px; text-align:center;">
+    <h2 style="color:var(--dark-green);">Access Denied</h2>
+    <p style="color:#666;">You must be a farmer or admin to view this page.</p>
+    <a href="/dashboard" style="color:var(--green); font-weight:600;">Return to Dashboard</a>
+  </div>
+{% else %}
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">🌿 KropKart</div>
+  <div class="nav-item active">Dashboard</div>
+  <div class="nav-item">My Products</div>
+  <div class="nav-item">Orders</div>
+  <div class="nav-item">Add Product</div>
+  <div class="nav-item">Earnings</div>
+  <div class="nav-item">Settings</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h2>Seller Dashboard</h2>
+    <div class="profile">
+      <span>Farmer Name</span>
+      <img src="https://i.pravatar.cc/100" alt="User">
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <h3>₹ 85,000</h3>
+      <p>Total Revenue</p>
+    </div>
+    <div class="stat-card">
+      <h3>128</h3>
+      <p>Total Products</p>
+    </div>
+    <div class="stat-card">
+      <h3>58</h3>
+      <p>Orders</p>
+    </div>
+    <div class="stat-card">
+      <h3>12</h3>
+      <p>Pending</p>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-section">
+    <h3>Recent Orders</h3>
+    <table>
+      <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td>#ORD9821</td>
+        <td>Organic Fertilizer</td>
+        <td>5</td>
+        <td><span class="status active">Delivered</span></td>
+      </tr>
+      <tr>
+        <td>#ORD9822</td>
+        <td>Hybrid Seeds</td>
+        <td>10</td>
+        <td><span class="status pending">Pending</span></td>
+      </tr>
+      <tr>
+        <td>#ORD9823</td>
+        <td>Bio Pesticide</td>
+        <td>3</td>
+        <td><span class="status out">Cancelled</span></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+  {% endif %}
+
+  </body>
+  </html>

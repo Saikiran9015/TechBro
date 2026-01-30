@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}List New Product | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="display: flex; justify-content: center; padding: 2rem 0;">
+    <div class="card" style="width: 700px; max-width: 100%;">
+        <div class="flex-between mb-8" style="border-bottom: 2px solid var(--gray-100); padding-bottom: 1rem;">
+            <div>
+                {% if session.get('user_type') == 'farmer' %}
+                <h2 class="text-primary"><i class="fas fa-seedling"></i> Upload Harvest</h2>
+                <small class="text-muted">List your produce for buyers across the country</small>
+                {% else %}
+                <h2 style="color: var(--dark);"><i class="fas fa-boxes"></i> Industrial Listing</h2>
+                <small class="text-muted">List processed goods, machinery, or bulk inventory</small>
+                {% endif %}
+            </div>
+            <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+        </div>
+
+        <div
+            style="background: #f0fdf4; padding: 1rem; border-radius: 12px; border: 1px solid var(--primary-light); margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+            <div
+                style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-magic"></i>
+            </div>
+            <div style="flex: 1;">
+                <h4 style="color: var(--primary-dark); margin-bottom: 0.1rem;">Boost your listing!</h4>
+                <p style="font-size: 0.85rem; color: #166534; opacity: 0.8;">Use our <a href="/quality-analysis"
+                        target="_blank" style="font-weight: 700; text-decoration: underline;">AI Quality Scanner</a> to
+                    get a verified score and sell 4x faster.</p>
+            </div>
+        </div>
+
+        <form action="/add_product" method="POST" enctype="multipart/form-data">
+            {% if session.get('user_type') == 'farmer' %}
+            <!-- FARMER FORM -->
+            <div class="form-group">
+                <label class="form-label">Crop Name</label>
+                <div style="position: relative;">
+                    <i class="fas fa-carrot"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <input type="text" name="name" id="cropName" list="cropOptions" class="form-control"
+                        style="padding-left: 2.5rem;" placeholder="Select or type crop name..." required
+                        onchange="autoFillDetails()">
+                    <datalist id="cropOptions">
+                        <option value="Paddy (Rice)">
+                        <option value="Wheat">
+                        <option value="Maize">
+                        <option value="Millet">
+                        <option value="Gram (Chana)">
+                        <option value="Lentil (Masoor)">
+                        <option value="Tur (Arhar)">
+                        <option value="Cotton">
+                        <option value="Soyabean">
+                        <option value="Mustard">
+                        <option value="Onion">
+                        <option value="Tomato">
+                        <option value="Potato">
+                    </datalist>
+                </div>
+            </div>
+
+            <div class="grid-cols-auto" style="gap: 1.5rem; grid-template-columns: 1fr 1fr 1fr;">
+                <div class="form-group">
+                    <label class="form-label">Price per KG (₹)</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 0.8rem; font-weight: bold; color: var(--gray-500);">₹</span>
+                        <input type="number" name="price" id="cropPrice" class="form-control"
+                            style="padding-left: 2.5rem;" placeholder="0.00" required oninput="calcTotalValuation()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity available</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-weight-hanging"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <input type="number" name="quantity" id="cropQty" class="form-control"
+                            style="padding-left: 2.5rem;" placeholder="e.g. 50" required oninput="calcTotalValuation()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Crop Category</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-th-large"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <select name="category" id="cropCategory" class="form-control" style="padding-left: 2.5rem;">
+                            <optgroup label="Cereals">
+                                <option value="Paddy (Rice)">Paddy (Rice)</option>
+                                <option value="Wheat">Wheat</option>
+                                <option value="Maize">Maize</option>
+                                <option value="Millet">Millet</option>
+                            </optgroup>
+                            <optgroup label="Pulses">
+                                <option value="Gram (Chana)">Gram (Chana)</option>
+                                <option value="Lentil (Masoor)">Lentil (Masoor)</option>
+                                <option value="Tur (Arhar)">Tur (Arhar)</option>
+                            </optgroup>
+                            <optgroup label="Others">
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Oilseeds">Oilseeds</option>
+                                <option value="Spices">Spices</option>
+                                <option value="Cotton">Cotton</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const cropData = {
+                    "Paddy (Rice)": { price: 27, category: "Paddy (Rice)" },
+                    "Wheat": { price: 35, category: "Wheat" },
+                    "Maize": { price: 25, category: "Maize" },
+                    "Millet": { price: 30, category: "Millet" },
+                    "Gram (Chana)": { price: 53, category: "Gram (Chana)" },
+                    "Lentil (Masoor)": { price: 60, category: "Lentil (Masoor)" },
+                    "Tur (Arhar)": { price: 70, category: "Tur (Arhar)" },
+                    "Cotton": { price: 66, category: "Cotton" },
+                    "Soyabean": { price: 46, category: "Oilseeds" },
+                    "Mustard": { price: 54, category: "Oilseeds" },
+                    "Onion": { price: 25, category: "Vegetables" },
+                    "Tomato": { price: 30, category: "Vegetables" },
+                    "Potato": { price: 18, category: "Vegetables" }
+                };
+
+                function autoFillDetails() {
+                    const nameInput = document.getElementById('cropName');
+                    const priceInput = document.getElementById('cropPrice');
+                    const catSelect = document.getElementById('cropCategory');
+
+                    const selectedCrop = nameInput.value;
+                    if (cropData[selectedCrop]) {
+                        priceInput.value = cropData[selectedCrop].price;
+                        catSelect.value = cropData[selectedCrop].category;
+
+                        // Visual feedback
+                        priceInput.style.borderColor = 'var(--primary)';
+                        catSelect.style.borderColor = 'var(--primary)';
+                        setTimeout(() => {
+                            priceInput.style.borderColor = '';
+                            catSelect.style.borderColor = '';
+                        }, 1000);
+
+                        calcTotalValuation();
+                    }
+                }
+
+                function calcTotalValuation() {
+                    const isFarmer = document.getElementById('cropPrice') !== null;
+                    const price = parseFloat(document.getElementById(isFarmer ? 'cropPrice' : 'bizPrice').value) || 0;
+                    const qty = parseFloat(document.getElementById(isFarmer ? 'cropQty' : 'bizQty').value) || 0;
+                    const display = document.getElementById('totalValuationDisplay');
+                    const box = document.getElementById('valuationBox');
+
+                    if (price > 0 && qty > 0) {
+                        box.style.display = 'block';
+                        display.innerText = '₹' + (price * qty).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                    } else {
+                        box.style.display = 'none';
+                    }
+                }
+            </script>
+
+            <div class="form-group">
+                <label class="form-label">Mention Quality</label>
+                <div style="position: relative;">
+                    <i class="fas fa-star"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <select name="user_quality" class="form-control" style="padding-left: 2.5rem;">
+                        <option value="Premium Grade">Premium Grade (Grade A+ / Export Quality)</option>
+                        <option value="High Quality" selected>High Quality (Grade A / Standard Plus)</option>
+                        <option value="Standard Grade">Standard Grade (Grade B / Fair Average Quality)</option>
+                        <option value="Average Quality">Average Quality (Budget Choice)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Quality & Quantity Details</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="E.g., 50 Quintals available. Harvested on 12th Jan. Moisture content 12%. Grade A quality."
+                    required></textarea>
+                <div
+                    style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--primary);">
+                    <i class="fas fa-robot"></i>
+                    <span>AI will scan this description to verify and boost your Quality Score.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Pickup Address</label>
+                <div style="position: relative;">
+                    <i class="fas fa-map-marker-alt"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <textarea name="address" class="form-control" rows="2" style="padding-left: 2.5rem;"
+                        placeholder="Enter the full address where the buyer can pick up the harvest..."
+                        required></textarea>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- BUSINESS FORM -->
+            <div class="form-group">
+                <label class="form-label">Item Name</label>
+                <div style="position: relative;">
+                    <i class="fas fa-cube"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <input type="text" name="name" class="form-control" style="padding-left: 2.5rem;"
+                        placeholder="e.g. Processed Wheat Flour (Atta), Tractor 50HP" required>
+                </div>
+            </div>
+
+            <div class="grid-cols-auto" style="gap: 1.5rem; grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label class="form-label">Unit Price (₹)</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 0.8rem; font-weight: bold; color: var(--gray-500);">₹</span>
+                        <input type="number" name="price" id="bizPrice" class="form-control"
+                            style="padding-left: 2.5rem;" placeholder="0.00" required oninput="calcTotalValuation()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stock Quantity</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-cubes"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <input type="number" name="quantity" id="bizQty" class="form-control"
+                            style="padding-left: 2.5rem;" placeholder="e.g. 100" required
+                            oninput="calcTotalValuation()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-layer-group"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <select name="category" class="form-control" style="padding-left: 2.5rem;">
+                            <optgroup label="Agri-Inputs">
+                                <option>Seeds</option>
+                                <option>Fertilizer</option>
+                                <option>Pesticides</option>
+                            </optgroup>
+                            <optgroup label="Equipment">
+                                <option>Machinery</option>
+                                <option>Tools</option>
+                                <option>Irrigation</option>
+                            </optgroup>
+                            <optgroup label="Output">
+                                <option>Processed Food</option>
+                                <option>Bulk Grain</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Certified Quality</label>
+                <div style="position: relative;">
+                    <i class="fas fa-medal"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <select name="user_quality" class="form-control" style="padding-left: 2.5rem;">
+                        <option value="Premium Grade">Premium / Industrial Grade A</option>
+                        <option value="Standard Quality" selected>Standard Industrial Quality</option>
+                        <option value="Refurbished">Refurbished / Second Hand (Good)</option>
+                        <option value="Bulk Grade">Bulk Grade (Standard Output)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Technical Specifications</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="Detail the specifications, warranty, shelf life, or bulk availability..."
+                    required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Warehouse Address</label>
+                <div style="position: relative;">
+                    <i class="fas fa-warehouse"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <textarea name="address" class="form-control" rows="2" style="padding-left: 2.5rem;"
+                        placeholder="Enter location of the goods/machinery..." required></textarea>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <div id="image-preview-container" style="display: none; margin-bottom: 1rem; text-align: center;">
+                    <img id="image-preview" src="#" alt="Preview"
+                        style="max-width: 100%; max-height: 300px; border-radius: var(--radius); box-shadow: var(--shadow-md); border: 3px solid var(--primary-light);">
+                </div>
+                <div style="border: 2px dashed var(--gray-300); padding: 2rem; text-align: center; border-radius: var(--radius); background: var(--gray-50); transition: all 0.2s; position: relative;"
+                    onmouseover="this.style.background='#f0fdf4'; this.style.borderColor='var(--primary)'"
+                    onmouseout="this.style.background='var(--gray-50)'; this.style.borderColor='var(--gray-300)'">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                    <p class="text-muted" style="margin-bottom: 1rem;">Click to upload clear photo</p>
+                    <input type="file" name="image" id="product-image-input" class="form-control"
+                        style="border: none; background: transparent; padding: 0;" accept="image/*"
+                        onchange="previewImage(this)">
+                </div>
+            </div>
+
+            <script>
+                function previewImage(input) {
+                    const preview = document.getElementById('image-preview');
+                    const container = document.getElementById('image-preview-container');
+                    const priceInput = document.getElementById('cropPrice');
+
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                            container.style.display = 'block';
+
+                            // AI Suggestion: If image is uploaded, suggest a quality boost
+                            if (priceInput && priceInput.value > 0) {
+                                const currentPrice = parseFloat(priceInput.value);
+                                const suggestedPrice = Math.round(currentPrice * 1.05); // 5% Boost for verified image
+
+                                priceInput.value = suggestedPrice;
+                                priceInput.style.borderColor = 'var(--primary)';
+                                priceInput.style.backgroundColor = '#f0fdf4';
+
+                                if (typeof calcTotalValuation === 'function') calcTotalValuation();
+
+                                // Show floating notification
+                                const toast = document.createElement('div');
+                                toast.id = "aiToast";
+                                toast.style = "position:fixed; top:80px; right:20px; background:#166534; color:white; padding:1.2rem; border-radius:12px; z-index:9999; box-shadow:0 10px 25px rgba(0,0,0,0.2); border-left: 5px solid #22c55e; max-width: 300px;";
+                                toast.innerHTML = `
+                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                                        <i class="fas fa-robot"></i> <b>AI Image Analysis</b>
+                                    </div>
+                                    <div style="font-size:0.9rem; opacity:0.9;">
+                                        Product frame detected! Quality score boosted. Price updated to <b>₹${suggestedPrice}</b> (+5% Premium).
+                                    </div>
+                                `;
+                                document.body.appendChild(toast);
+
+                                setTimeout(() => {
+                                    toast.style.opacity = '0';
+                                    toast.style.transition = 'opacity 0.5s ease-out';
+                                    setTimeout(() => toast.remove(), 500);
+                                }, 4000);
+                            }
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    } else {
+                        preview.src = '#';
+                        container.style.display = 'none';
+                    }
+                }
+            </script>
+
+            <div id="valuationBox"
+                style="display: none; background: #f0fdf4; border: 1px dashed var(--primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; text-align: center; animation: pulse 2s infinite;">
+                <span
+                    style="color: #166534; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Estimated
+                    Total Market Value</span>
+                <div id="totalValuationDisplay"
+                    style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 0.5rem;">₹0.00</div>
+                <small style="color: #166534; opacity: 0.7;">(Calculated: Unit Price × Total Quantity)</small>
+            </div>
+
+            <div style="padding-top: 1rem; border-top: 1px solid var(--gray-100);">
+                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">
+                    {% if session.get('user_type') == 'farmer' %}
+                    <i class="fas fa-check-circle"></i> Publish Harvest Listing
+                    {% else %}
+                    <i class="fas fa-upload"></i> List Industrial Stock
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

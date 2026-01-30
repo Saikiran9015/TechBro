@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Farmer — Add Product</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--green:#2f7d32;--dark-green:#166534;--white:#fff;--muted:#f2f7f1;--text:#13321f}
+    body{font-family:'Poppins',sans-serif;background:var(--muted);color:var(--text);padding:20px}
+    .card{background:var(--white);padding:18px;border-radius:8px;max-width:760px;margin:18px auto;box-shadow:0 8px 22px rgba(0,0,0,0.06)}
+    label{display:block;margin-top:10px;font-weight:600}
+    input[type="text"], input[type="number"], textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #e6efe6}
+    .row{display:flex;gap:12px}
+    .btn{background:var(--green);color:var(--white);padding:10px 14px;border-radius:6px;border:none;cursor:pointer;margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Add Product</h2>
+    <p>Add a product and the system will estimate quality and compute an adjusted price including government rate + quality bonus.</p>
+    <form method="POST" action="/seller-dashboard/add" enctype="multipart/form-data">
+      <label>Name</label>
+      <input type="text" name="name" required>
+
+      <label>Category</label>
+      <input type="text" name="category">
+
+      <label>Base Price (₹)</label>
+      <input type="number" step="0.01" name="price" required>
+
+      <label>Image Upload (optional)</label>
+      <input type="file" name="image" accept="image/*">
+
+      <label>Description</label>
+      <textarea name="description" rows="4"></textarea>
+
+      <button class="btn" type="submit">Save product</button>
+    </form>
+    <div style="margin-top:14px;"><a href="/seller-dashboard" style="color:var(--dark-green);text-decoration:none">Back to dashboard</a></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Industry Marketplace | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="hero-gradient" style="background: linear-gradient(135deg, var(--dark), var(--gray-800));">
+        <h1 style="color: white; margin-bottom: 0.5rem;"><i class="fas fa-briefcase"></i> Business Control Panel</h1>
+        {% if session.get('user_id') %}
+        <p style="color: #e2e8f0; font-weight: 700; margin-bottom: 1rem;"><i class="fas fa-id-badge"></i> Business ID:
+            {{ session.get('user_id') }}</p>
+        {% endif %}
+        <p style="opacity: 0.9; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Procure high-volume produce or
+            list your own industrial stock.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-primary mt-4" style="background: white; color: var(--dark); font-weight: 800;"
+                onclick="document.getElementById('addModal').style.display='flex'">
+                <i class="fas fa-plus-circle"></i> List Inventory
+            </button>
+            <button class="btn btn-secondary mt-4"
+                style="background: #141a23; color: var(--primary); font-weight: 800; border: 1px solid var(--primary);"
+                onclick="window.location.href='/quality-analysis'">
+                <i class="fas fa-microscope"></i> AI Quality Scanner
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-between mb-4">
+        <h2><i class="fas fa-boxes text-secondary"></i> Marketplace Listings</h2>
+        <span class="badge" style="background: var(--gray-200); color: var(--gray-600);">{{ products|length }}
+            Lots</span>
+    </div>
+
+    <div class="grid-cols-auto">
+        {% for product in products %}
+        <div class="card">
+            <div
+                style="height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; position: relative; background: var(--gray-100);">
+                {% if product.image %}
+                <img src="{{ product.image }}" class="img-cover" alt="{{ product.name }}">
+                {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <i class="fas fa-seedling fa-3x" style="color: var(--gray-300);"></i>
+                </div>
+                {% endif %}
+                <div
+                    style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+                    <div class="badge badge-ai">
+                        <i class="fas fa-robot"></i> AI Score: {{ product.quality_score }}
+                    </div>
+                    <div class="badge" style="background: var(--primary); color: white; font-size: 0.7rem;">
+                        {{ product.quality_label }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-between mb-2">
+                <h3 style="font-size: 1.2rem;">{{ product.name }}</h3>
+                <small class="text-muted"><i class="fas fa-user-circle"></i> {{ product.owner }}</small>
+            </div>
+
+            <p class="text-muted"
+                style="font-size: 0.9rem; line-height: 1.5; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
+                {{ product.description }}
+            </p>
+
+            {% if product.quantity is defined %}
+            <div style="margin-top: 0.5rem; font-size: 0.85rem; font-weight: 700;">
+                <span style="color: {{ '#dc2626' if product.quantity <= 0 else 'var(--primary)' }}">
+                    <i class="fas fa-cubes"></i> Stock: {{ product.quantity if product.quantity > 0 else 'OUT OF STOCK'
+                    }}
+                </span>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100);"
+                class="flex-between">
+                <span style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">₹{{ product.adjusted_price
+                    }}/kg</span>
+                {% if product.quantity is defined and product.quantity <= 0 %} <button class="btn btn-secondary"
+                    disabled style="cursor: not-allowed; opacity: 0.6;">
+                    Sold Out
+                    </button>
+                    {% else %}
+                    <button class="btn btn-primary" onclick="window.location.href='/checkout/{{ product._id }}'">
+                        <i class="fas fa-file-invoice"></i> Procure
+                    </button>
+                    {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Product Modal for Business -->
+<div id="addModal" class="glass"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+    <div class="card"
+        style="width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--gray-300);">
+        <div class="flex-between mb-8" style="border-bottom: 2px solid var(--gray-100); padding-bottom: 1rem;">
+            <div>
+                <h2 style="color: var(--dark);"><i class="fas fa-boxes"></i> Industrial Listing</h2>
+                <small class="text-muted">List processed goods, machinery, or bulk inventory</small>
+            </div>
+            <button class="btn" style="padding: 0.5rem; border-radius: 50%; width: 2.5rem; height: 2.5rem;"
+                onclick="document.getElementById('addModal').style.display='none'">
+                <i class="fas fa-times fa-lg text-muted"></i>
+            </button>
+        </div>
+
+        <form action="/add_product" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label">Item Name</label>
+                <div style="position: relative;">
+                    <i class="fas fa-cube"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <input type="text" name="name" class="form-control" style="padding-left: 2.5rem;"
+                        placeholder="e.g. Processed Wheat Flour (Atta), Tractor 50HP" required>
+                </div>
+            </div>
+
+            <div class="grid-cols-auto" style="gap: 1.5rem; grid-template-columns: 1fr 1fr 1fr;">
+                <div class="form-group">
+                    <label class="form-label">Unit Price (₹)</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 0.8rem; font-weight: bold; color: var(--gray-500);">₹</span>
+                        <input type="number" name="price" class="form-control" style="padding-left: 2.5rem;"
+                            placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stock Quantity</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-cubes"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <input type="number" name="quantity" class="form-control" style="padding-left: 2.5rem;"
+                            placeholder="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-layer-group"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <select name="category" class="form-control" style="padding-left: 2.5rem;">
+                            <optgroup label="Agri-Inputs">
+                                <option>Seeds</option>
+                                <option>Fertilizer</option>
+                                <option>Pesticides</option>
+                            </optgroup>
+                            <optgroup label="Equipment">
+                                <option>Machinery</option>
+                                <option>Tools</option>
+                                <option>Irrigation</option>
+                            </optgroup>
+                            <optgroup label="Output">
+                                <option>Processed Food</option>
+                                <option>Bulk Grain</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Certified Quality</label>
+                <div style="position: relative;">
+                    <i class="fas fa-medal"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <select name="user_quality" class="form-control" style="padding-left: 2.5rem;">
+                        <option value="Premium Grade">Premium / Industrial Grade A</option>
+                        <option value="Standard Quality" selected>Standard Industrial Quality</option>
+                        <option value="Refurbished">Refurbished / Second Hand (Good)</option>
+                        <option value="Bulk Grade">Bulk Grade (Standard Output)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Technical Specifications</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="Detail the specifications, warranty, shelf life, or bulk availability..."
+                    required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <div style="border: 2px dashed var(--gray-400); padding: 2rem; text-align: center; border-radius: var(--radius); background: var(--white); transition: all 0.2s;"
+                    onmouseover="this.style.borderColor='var(--dark)'"
+                    onmouseout="this.style.borderColor='var(--gray-400)'">
+                    <i class="fas fa-image fa-2x text-muted mb-3"></i>
+                    <p class="text-muted" style="margin-bottom: 1rem;">Upload high-res image</p>
+                    <input type="file" name="image" class="form-control"
+                        style="border: none; background: transparent; padding: 0;">
+                </div>
+            </div>
+
+            <div style="padding-top: 1rem; border-top: 1px solid var(--gray-100);">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; background: var(--dark); border-color: var(--dark); padding: 1rem; font-size: 1.1rem;">
+                    <i class="fas fa-upload"></i> List Inventory
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

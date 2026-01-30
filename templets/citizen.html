@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Citizen Marketplace | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+  <div class="hero-gradient" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+    <h1 style="color: white; margin-bottom: 1rem;">Freshness at Your Doorstep</h1>
+    <p style="opacity: 0.95; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Secure AI-Verified Produce from
+      Farmers & Businesses. From the earth to your table.</p>
+  </div>
+
+  <div class="flex-between mb-4">
+    <h2><i class="fas fa-shopping-basket text-primary"></i> Fresh Picks For You</h2>
+  </div>
+
+  <div class="grid-cols-auto">
+    {% for product in products %}
+    <div class="card">
+      <div
+        style="height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; position: relative; background: var(--gray-100);">
+        {% if product.image %}
+        <img src="{{ product.image }}" class="img-cover" alt="{{ product.name }}">
+        {% else %}
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+          <i class="fas fa-apple-whole fa-3x" style="color: var(--gray-300);"></i>
+        </div>
+        {% endif %}
+      </div>
+
+      <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ product.name }}</h3>
+
+      <p class="text-muted"
+        style="font-size: 0.9rem; line-height: 1.5; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
+        {{ product.description }}
+      </p>
+
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100);" class="flex-between">
+        <span style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">₹{{ product.adjusted_price }}</span>
+        <button class="btn btn-primary" onclick="window.location.href='/checkout/{{ product._id }}'">
+          Buy Now <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

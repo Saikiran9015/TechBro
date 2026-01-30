@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    :root{
+        --green: #2f7d32;
+        --yellow: #ffb703;
+        --dark-green: #166534;
+        --white: #ffffff;
+        --muted: #f2f7f1;
+        --text: #13321f;
+    }
+
+    body{
+        background:var(--muted);
+        font-family:'Poppins', sans-serif;
+    }
+
+    /* SHIPPING TRACKING */
+    .tracking-card {
+      background: var(--white);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      margin-top: 20px;
+      border:1px solid rgba(22,101,52,0.04);
+    }
+
+    .tracking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      color:var(--text);
+    }
+
+    .tracking-header .status {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .tracking-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 30px 0;
+    }
+
+    .step {
+      text-align: center;
+      width: 100px;
+    }
+
+    .circle {
+      width: 42px;
+      height: 42px;
+      background: #e0e0e0;
+      color: #777;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      font-weight: bold;
+    }
+
+    .step.completed .circle {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .step.active .circle {
+      background: var(--yellow);
+      color: var(--text);
+    }
+
+    .line {
+      flex: 1;
+      height: 4px;
+      background: #e0e0e0;
+    }
+
+    .step.completed + .line {
+      background: var(--green);
+    }
+
+    .delivery-info {
+      margin-top: 20px;
+      background: rgba(47,125,50,0.03);
+      padding: 15px;
+      border-radius: 8px;
+      border:1px solid rgba(22,101,52,0.06);
+      color:var(--text);
+    }
+
+    </style>
+</head>
+<body>
+    <!-- SHIPPING TRACKING SECTION -->
+<div class="table-section">
+  <h3>Order Tracking</h3>
+
+  <div class="tracking-card">
+    <div class="tracking-header">
+      <div>
+        <strong>Order ID:</strong> #ORD4582<br>
+        <small>Placed on: 12 Feb 2025</small>
+      </div>
+      <span class="status delivered">Delivered</span>
+    </div>
+
+    <div class="tracking-steps">
+      <div class="step completed">
+        <div class="circle">✓</div>
+        <p>Order Placed</p>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="step completed">
+        <div class="circle">✓</div>
+        <p>Packed</p>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="step completed">
+        <div class="circle">✓</div>
+        <p>Shipped</p>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="step active">
+        <div class="circle">🚚</div>
+        <p>Delivered</p>
+      </div>
+    </div>
+
+    <div class="delivery-info">
+      <p><strong>Courier:</strong> Delhivery</p>
+      <p><strong>Tracking ID:</strong> DLV8923478</p>
+      <p><strong>Delivery Address:</strong> Hyderabad, Telangana</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

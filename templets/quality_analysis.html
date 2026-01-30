@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quality Analysis | KropKart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #00d4ff;
+            --bg-dark: #0a0e14;
+            --card-bg: rgba(20, 26, 35, 0.8);
+            --text-light: #e0e6ed;
+            --accent: #ff007a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 40%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        nav {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 14, 20, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: 0.3s;
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        main {
+            padding: 4rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .header-section h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .header-section span {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-section p {
+            font-size: 1.2rem;
+            opacity: 0.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .scanner-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .upload-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .image-preview-container {
+            display: none;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        #imagePreview {
+            width: 100%;
+            display: block;
+            border-radius: 16px;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            box-shadow: 0 0 15px var(--primary);
+            z-index: 10;
+            display: none;
+            animation: moveScan 2s linear infinite;
+        }
+
+        @keyframes moveScan {
+            0% {
+                top: 0;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .results-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 2.5rem;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .score-display {
+            text-align: right;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .metric-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 1.2rem;
+            margin-top: 2rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #000;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 5rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--primary);
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            opacity: 0.6;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 992px) {
+            .scanner-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header-section h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <i class="fas fa-leaf"></i> KropKart<span>X</span>
+        </div>
+        <div class="nav-links">
+            <a href="/">Marketplace</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="header-section">
+            <h1>AI Product <span>Quality Scanner</span></h1>
+            <p>Leverage our advanced neural networks to analyze freshness, sizing, and defect detection in seconds using
+                just a photo.</p>
+        </div>
+
+        <div class="scanner-container">
+            <div class="upload-card">
+                <input type="file" id="fileInput" hidden accept="image/*">
+                <div class="upload-area" id="dropArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Product Image</h3>
+                    <p>Drag and drop or click to browse</p>
+                    <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.4;">Supported: JPG, PNG, WEBP (Max 5MB)
+                    </p>
+                </div>
+
+                <div class="image-preview-container" id="previewContainer">
+                    <div class="scan-line" id="scanLine"></div>
+                    <img id="imagePreview" src="" alt="Preview">
+                </div>
+
+                <button class="analyze-btn" id="analyzeBtn">Analyze Quality</button>
+
+                <div class="loading-spinner" id="loadingSection">
+                    <div class="fa-3x">
+                        <i class="fas fa-spinner fa-spin" style="color: var(--primary);"></i>
+                    </div>
+                    <p class="loading-text">Neural networks processing image pixels...</p>
+                </div>
+            </div>
+
+            <div class="results-layout">
+                <div class="results-card" id="resultsBox">
+                    <div class="result-header">
+                        <div>
+                            <h2 style="margin-bottom: 0.2rem;">Analysis Report</h2>
+                            <p id="reportDate" style="font-size: 0.85rem; opacity: 0.5;"></p>
+                        </div>
+                        <div class="score-display">
+                            <div class="score-value" id="resScore">--</div>
+                            <div class="score-label">Global Score</div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">Freshness Confidence</div>
+                            <div class="metric-value" id="resFreshness">--</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Ripeness Stage</div>
+                            <div class="metric-value" id="resRipeness">--</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Visual Defects</div>
+                            <div class="metric-value" id="resDefects">--</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Market Grade</div>
+                            <div class="metric-value" id="resGrade" style="color: var(--primary);">--</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                        <div class="metric-label">Recommended Listing Price</div>
+                        <div class="metric-value" id="resValuation" style="font-size: 2rem; color: #fff;">--</div>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.4;">*Based on current market trends
+                            and quality score.</p>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                        <button class="analyze-btn"
+                            style="display: block; flex: 1; border: 1px solid var(--primary); background: transparent; color: var(--primary);">
+                            <i class="fas fa-download"></i> Save Report
+                        </button>
+                        <a href="/add-listing" class="analyze-btn"
+                            style="display: block; flex: 1; text-align: center; text-decoration: none; padding: 1.2rem;">
+                            List Product
+                        </a>
+                    </div>
+                </div>
+
+                <div id="tutorialSection" style="padding: 2rem;">
+                    <h3>How it works</h3>
+                    <ul style="margin-top: 1.5rem; list-style: none;">
+                        <li style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                            <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                            <span><b>Capture:</b> Take a clear photo of your produce in natural light.</span>
+                        </li>
+                        <li style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                            <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                            <span><b>Scan:</b> AI analyzes color depth, texture, and size uniformity.</span>
+                        </li>
+                        <li style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                            <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                            <span><b>Verify:</b> Get a tamper-proof quality certificate for your listing.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-robot"></i>
+                <h3>Computer Vision</h3>
+                <p>Advanced pixel-level analysis for identifying even the smallest surface blemishes and ripeness
+                    indicators.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Price Optimization</h3>
+                <p>Dynamically calculates fair market value based on your product's specific quality metrics and local
+                    demand.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Buyer Trust</h3>
+                <p>Products with AI-verified quality scores sell up to 4x faster by providing transparency to potential
+                    buyers.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const scanLine = document.getElementById('scanLine');
+        const loadingSection = document.getElementById('loadingSection');
+        const resultsBox = document.getElementById('resultsBox');
+        const tutorialSection = document.getElementById('tutorialSection');
+
+        dropArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    dropArea.style.display = 'none';
+                    previewContainer.style.display = 'block';
+                    analyzeBtn.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        analyzeBtn.addEventListener('click', async () => {
+            analyzeBtn.disabled = true;
+            loadingSection.style.display = 'block';
+            scanLine.style.display = 'block';
+            resultsBox.style.display = 'none';
+            tutorialSection.style.display = 'none';
+
+            // Simulate AI analysis time
+            const steps = [
+                "Decompressing image...",
+                "Enhancing visual contrast...",
+                "Running defect detection models...",
+                "Calculating freshness index...",
+                "Finalizing report..."
+            ];
+
+            const loadingText = document.querySelector('.loading-text');
+            for (let step of steps) {
+                loadingText.innerText = step;
+                await new Promise(r => setTimeout(r, 600));
+            }
+
+            try {
+                const response = await fetch('/run-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                // Display Results
+                document.getElementById('reportDate').innerText = 'Generated on ' + new Date().toLocaleString();
+                document.getElementById('resScore').innerText = data.quality_score;
+                document.getElementById('resFreshness').innerText = data.freshness;
+                document.getElementById('resRipeness').innerText = data.ripeness;
+                document.getElementById('resDefects').innerText = data.defects;
+                document.getElementById('resGrade').innerText = data.grade;
+                document.getElementById('resValuation').innerText = data.market_valuation;
+
+                loadingSection.style.display = 'none';
+                scanLine.style.display = 'none';
+                resultsBox.style.display = 'block';
+                analyzeBtn.innerText = "Scan New Product";
+                analyzeBtn.disabled = false;
+                analyzeBtn.addEventListener('click', () => window.location.reload(), { once: true });
+
+            } catch (error) {
+                console.error("Analysis failed", error);
+                alert("AI Analysis failed. Please try again.");
+                analyzeBtn.disabled = false;
+            }
+        });
+
+        // Add drag & drop support
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            fileInput.files = files;
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+    </script>
+</body>
+
+</html>

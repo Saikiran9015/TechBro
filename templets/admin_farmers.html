@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Products</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2f7d32;--dark-green:#166534;--white:#fff;--muted:#f2f7f1;--text:#13321f}
+body{font-family:'Poppins',sans-serif;background:var(--muted);color:var(--text);padding:24px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.table{width:100%;border-collapse:collapse;background:var(--white);box-shadow:0 6px 18px rgba(0,0,0,0.06);border-radius:8px;overflow:hidden}
+th,td{padding:12px 14px;border-bottom:1px solid #eee;text-align:left}
+th{background:rgba(47,125,50,0.06);color:var(--green)}
+img.prod{width:96px;height:64px;object-fit:cover;border-radius:6px}
+.btn{background:var(--green);color:var(--white);padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+.del{background:#e53e3e}
+.notice{margin-bottom:12px;color:#666}
+</style>
+</head>
+<body>
+<div class="header">
+  <h2>Admin — Product Management</h2>
+  <div><a href="/admin" style="color:var(--dark-green);text-decoration:none;font-weight:600">Back to Admin</a></div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div style="margin-bottom:12px;">
+      {% for cat,msg in messages %}
+        <div style="padding:10px;border-radius:6px;margin-bottom:6px;color:#fff; background: {% if cat=='success' %}var(--green){% else %}#e53e3e{% endif %};">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<p class="notice">Products listed from the database. Delete removes the product permanently.</p>
+
+<table class="table">
+  <thead>
+    <tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Owner</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for p in products %}
+      <tr>
+        <td>{% if p.image %}<img src="{{ p.image }}" class="prod">{% else %}-{% endif %}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.category }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.owner }}</td>
+        <td>
+          <form method="POST" action="/admin/delete_product" style="display:inline;">
+            <input type="hidden" name="product_id" value="{{ p._id }}">
+            <button class="btn del" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html>

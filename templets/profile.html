@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="hero-gradient" style="padding: 3rem 2rem; margin-bottom: 2rem; text-align: left;">
+        <h1 style="color: white; margin-bottom: 0.5rem;"><i class="fas fa-user-circle"></i> My Profile</h1>
+        <p style="opacity: 0.9; font-size: 1.1rem;">Manage your personal information, bank account, and payment methods.
+        </p>
+    </div>
+
+    <div class="grid-cols-auto" style="grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+        <!-- Profile Sidebar -->
+        <div class="card" style="position: sticky; top: 100px;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div
+                    style="width: 120px; height: 120px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary); font-size: 3rem; border: 4px solid white; box-shadow: var(--shadow-md);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>{{ user.name }}</h3>
+                <span class="badge badge-ai">{{ user.user_type|upper }}</span>
+                {% if user.user_id %}
+                <p class="text-primary font-bold" style="margin-top: 0.5rem; letter-spacing: 1px;">
+                    <i class="fas fa-id-badge"></i> {{ user.user_id }}
+                </p>
+                {% endif %}
+                <p class="text-muted" style="margin-top: 1rem;"><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                <p class="text-muted"><i class="fas fa-calendar-alt"></i> Joined {{ user.created_at.strftime('%b %Y') if
+                    user.created_at else 'N/A' }}</p>
+            </div>
+
+            <div style="border-top: 1px solid var(--gray-100); padding-top: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; color: var(--primary);">
+                    <i class="fas fa-wallet fa-lg"></i>
+                    <div>
+                        <small class="text-muted" style="display: block;">Wallet Balance</small>
+                        <span style="font-weight: 800; font-size: 1.2rem;">₹{{ user.wallet or 0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Profile Form -->
+        <div class="card shadow-lg">
+            <form action="/profile" method="POST">
+                <div style="margin-bottom: 2.5rem;">
+                    <h2 class="text-primary mb-6"><i class="fas fa-id-card"></i> Personal Information</h2>
+                    <div class="grid-cols-auto" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ user.phone or '' }}"
+                                placeholder="+91 XXXXX XXXXX">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Residential Address</label>
+                        <textarea name="address" class="form-control" rows="3"
+                            placeholder="Enter your full home address">{{ user.address or '' }}</textarea>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2.5rem; padding-top: 2rem; border-top: 2px solid var(--gray-100);">
+                    <h2 class="text-primary mb-6"><i class="fas fa-university"></i> Bank Account Details</h2>
+                    <p class="text-muted mb-6" style="font-size: 0.9rem;">Adding your bank details ensures fast payouts
+                        for your listed products.</p>
+
+                    <div class="grid-cols-auto" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" name="bank_name" class="form-control"
+                                value="{{ user.bank_details.bank_name if user.bank_details else '' }}"
+                                placeholder="e.g. State Bank of India">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account Number</label>
+                            <input type="text" name="account_number" class="form-control"
+                                value="{{ user.bank_details.account_number if user.bank_details else '' }}"
+                                placeholder="XXXXXXXXXXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IFSC Code</label>
+                            <input type="text" name="ifsc_code" class="form-control"
+                                value="{{ user.bank_details.ifsc_code if user.bank_details else '' }}"
+                                placeholder="SBIN000XXXX">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">UPI ID (Optional)</label>
+                            <input type="text" name="upi_id" class="form-control"
+                                value="{{ user.bank_details.upi_id if user.bank_details else '' }}"
+                                placeholder="username@upi">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2.5rem; padding-top: 2rem; border-top: 2px solid var(--gray-100);">
+                    <h2 class="text-primary mb-6"><i class="fas fa-credit-card"></i> Accepted Payment Methods</h2>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Select how you prefer to receive or make
+                        payments.</p>
+
+                    <div class="form-group">
+                        <label class="form-label">Payment Preferences</label>
+                        <input type="text" name="payment_methods" class="form-control"
+                            value="{{ user.payment_methods or '' }}"
+                            placeholder="e.g. UPI, Net Banking, Cash on Pickup">
+                        <small class="text-muted">Separate multiple methods with commas.</small>
+                    </div>
+                </div>
+
+                <div style="padding-top: 1rem;">
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 600;">
+                        <i class="fas fa-save"></i> Save Profile Details
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mb-6 {
+        margin-bottom: 1.5rem;
+    }
+
+    .shadow-lg {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
+{% endblock %}

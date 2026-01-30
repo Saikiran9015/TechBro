@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KropKart | Forgot Password</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --green: #2f7d32;
+    --yellow: #ffb703;
+    --dark-green: #166534;
+    --white: #ffffff;
+    --muted: #f2f7f1;
+    --text: #13321f;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins', sans-serif;
+}
+
+body{
+  background:var(--muted);
+}
+
+/* HEADER */
+.header{
+  background:var(--dark-green);
+  padding:15px 40px;
+  color:var(--white);
+  display:flex;
+  align-items:center;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:700;
+}
+
+/* FORM CONTAINER */
+.container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:calc(100vh - 70px);
+}
+
+.form-box{
+  background:var(--white);
+  padding:35px;
+  width:380px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  border:1px solid rgba(22,101,52,0.04);
+}
+
+.form-box h2{
+  text-align:center;
+  color:var(--green);
+  margin-bottom:15px;
+}
+
+.form-box p{
+  text-align:center;
+  font-size:14px;
+  color:#666;
+  margin-bottom:20px;
+}
+
+.form-box label{
+  font-weight:600;
+  margin-bottom:6px;
+  display:block;
+  color:var(--text);
+}
+
+.form-box input{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:1px solid rgba(22,101,52,0.12);
+  background:var(--white);
+}
+
+.form-box input:focus{
+  outline:none;
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(47,125,50,0.1);
+}
+
+.form-box button{
+  width:100%;
+  padding:12px;
+  background:var(--green);
+  color:var(--white);
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.form-box button:hover{
+  background:var(--dark-green);
+  box-shadow:0 4px 12px rgba(22,101,52,0.2);
+}
+
+.back-login{
+  margin-top:15px;
+  text-align:center;
+  font-size:14px;
+}
+
+.back-login a{
+  color:var(--green);
+  text-decoration:none;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">KropKart</div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div class="container">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-messages" style="position:fixed;top:18px;right:18px;z-index:9999;">
+      {% for category, msg in messages %}
+        <div class="flash-item" style="min-width:240px;margin-bottom:8px;padding:12px 14px;border-radius:8px;color:var(--white);font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,0.08);"
+             {% if category == 'success' %} style="background:var(--green);color:var(--white);min-width:240px;margin-bottom:8px;padding:12px 14px;border-radius:8px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,0.08);"{% else %} style="background:#e53e3e;color:var(--white);min-width:240px;margin-bottom:8px;padding:12px 14px;border-radius:8px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,0.08);"{% endif %}>
+          {{ msg }}
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function(){
+        const container = document.getElementById('flash-messages');
+        if(!container) return;
+        setTimeout(()=>{
+          container.style.transition = 'opacity 0.6s';
+          container.style.opacity = '0';
+          setTimeout(()=>{ if(container && container.parentNode) container.parentNode.removeChild(container); }, 700);
+        }, 3000);
+      });
+    </script>
+  {% endif %}
+{% endwith %}
+
+  <div class="form-box">
+    <h2>Forgot Password</h2>
+    <p>Enter your registered email address and we’ll send you a reset link.</p>
+
+    <form method="POST" action="/forgot">
+      <label>Email Address</label>
+      <input type="email" name="email" placeholder="Enter your email" required>
+
+      <button type="submit">Send Reset Link</button>
+    </form>
+
+    <div class="back-login">
+      Remember your password? <a href="/login">Login</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

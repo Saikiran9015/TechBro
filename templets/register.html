@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Register | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+  <div class="card" style="width: 500px; max-width: 100%;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <i class="fas fa-leaf fa-3x text-primary mb-4"></i>
+      <h2>Create Your Account</h2>
+      <p class="text-muted">Join KropKart and start your agricultural journey</p>
+    </div>
+
+    <form method="POST" action="/register" id="registerForm">
+      <!-- USER TYPE SELECTION -->
+      <div class="form-group">
+        <label class="form-label">I am a...</label>
+        <div class="grid-cols-auto" style="grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+          <label class="user-type-btn" onclick="selectUserType(this)">
+            <input type="radio" name="user_type" value="farmer" style="display: none;" required>
+            <i class="fas fa-tractor fa-lg mb-2"></i><br>
+            <small>Farmer</small>
+          </label>
+          <label class="user-type-btn" onclick="selectUserType(this)">
+            <input type="radio" name="user_type" value="business" style="display: none;">
+            <i class="fas fa-building fa-lg mb-2"></i><br>
+            <small>Business</small>
+          </label>
+          <label class="user-type-btn" onclick="selectUserType(this)">
+            <input type="radio" name="user_type" value="citizen" style="display: none;">
+            <i class="fas fa-user fa-lg mb-2"></i><br>
+            <small>Citizen</small>
+          </label>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <div style="position: relative;">
+          <i class="fas fa-user-circle" style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+          <input type="text" name="name" class="form-control" style="padding-left: 2.5rem;"
+            placeholder="Enter your full name" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div style="position: relative;">
+          <i class="fas fa-envelope" style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+          <input type="email" name="email" class="form-control" style="padding-left: 2.5rem;"
+            placeholder="name@example.com" required>
+        </div>
+      </div>
+
+      <div class="grid-cols-auto" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div style="position: relative;">
+            <i class="fas fa-lock" style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+            <input type="password" name="password" class="form-control" style="padding-left: 2.5rem;"
+              placeholder="•••••••" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm</label>
+          <div style="position: relative;">
+            <i class="fas fa-check-double"
+              style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+            <input type="password" name="confirm_password" class="form-control" style="padding-left: 2.5rem;"
+              placeholder="•••••••" required>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="submit" style="width: 100%;">
+        Create Account <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <p class="text-muted">Already have an account? <a href="/login" class="text-primary font-bold">Login</a></p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .user-type-btn {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--gray-600);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-type-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--primary-light);
+  }
+
+  .user-type-btn.active {
+    border-color: var(--primary);
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--primary);
+    font-weight: 700;
+  }
+</style>
+
+<script>
+  function selectUserType(element) {
+    document.querySelectorAll('.user-type-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+    element.querySelector('input').checked = true;
+  }
+</script>
+{% endblock %}

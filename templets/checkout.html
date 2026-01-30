@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <div class="flex-between mb-4" style="border-bottom: 2px solid var(--gray-100); padding-bottom: 1rem;">
+            <h2 class="text-primary"><i class="fas fa-shopping-cart"></i> Secure Checkout</h2>
+            <span class="badge badge-ai"><i class="fas fa-shield-alt"></i> Razorpay Secured</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Shipping Form -->
+            <div style="border-right: 1px solid var(--gray-100); padding-right: 1.5rem;">
+                <h3 class="mb-4 text-primary"><i class="fas fa-truck"></i> Delivery Information</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Order Quantity (in kg)</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-cubes"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <input type="number" id="orderQty" class="form-control" style="padding-left: 2.5rem;" value="1"
+                            min="1" max="{{ product.quantity or 100 }}" oninput="updateTotal()">
+                    </div>
+                    {% if product.quantity is defined %}
+                    <small class="text-muted">Available stock: {{ product.quantity }} units</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Delivery Address (Correct Address for Shiprocket)</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-map-marker-alt"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <textarea id="deliveryAddress" class="form-control" style="padding-left: 2.5rem;" rows="3"
+                            placeholder="Enter full delivery address with Pincode"
+                            required>{{ user.address if user and user.address else '' }}</textarea>
+                    </div>
+                    <small class="text-muted">Required for reliable Shiprocket delivery tracking.</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Pincode</label>
+                    <input type="text" id="pincode" class="form-control" placeholder="110001" maxlength="6">
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div>
+                <h3 class="mb-4 text-primary"><i class="fas fa-receipt"></i> Order Summary</h3>
+                <div
+                    style="height: 150px; border-radius: 1rem; overflow: hidden; background: var(--gray-100); margin-bottom: 1rem;">
+                    {% if product.image %}
+                    <img src="{{ product.image }}" class="img-cover" alt="{{ product.name }}">
+                    {% else %}
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                        <i class="fas fa-box fa-3x" style="color: var(--gray-300);"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <h4 style="margin-bottom: 0.5rem;">{{ product.name }}</h4>
+                <div style="background: var(--gray-50); padding: 1rem; border-radius: 0.5rem;">
+                    <div class="flex-between mb-2">
+                        <span class="text-muted">Unit Price</span>
+                        <span>₹{% if product.owner_type == 'farmer' %}{{ (product.adjusted_price) | round(2) }}/kg{%
+                            else %}{{ product.adjusted_price }}/unit{% endif %}</span>
+                    </div>
+                    <div class="flex-between mb-2">
+                        <span class="text-muted">Quantity</span>
+                        <span><span id="displayQty">1</span> {{ 'kg' if product.owner_type == 'farmer' else 'units'
+                            }}</span>
+                    </div>
+                    <div class="flex-between"
+                        style="border-top: 1px solid var(--gray-200); padding-top: 0.5rem; margin-top: 0.5rem; font-weight: 800; font-size: 1.2rem;">
+                        <span>Total Pay</span>
+                        <span class="text-primary" id="finalTotal">₹{% if product.owner_type == 'farmer' %}{{
+                            (product.adjusted_price) | round(2) }}{% else %}{{ product.adjusted_price }}{% endif
+                            %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Actions -->
+        <div style="text-align: right; padding-top: 1rem; border-top: 2px solid var(--gray-100);">
+            <a href="/dashboard" class="btn btn-secondary" style="margin-right: 1rem;">Cancel</a>
+            <button id="payBtn" class="btn btn-primary"
+                style="padding: 1rem 2.5rem; font-size: 1.2rem; border: none; cursor: pointer; border-radius: 0.75rem; box-shadow: var(--shadow-md);">
+                <i class="fas fa-lock"></i> Pay & Start Delivery
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Hidden Configuration for JavaScript -->
+<div id="checkoutConfig" data-key="{{ RAZORPAY_KEY_ID }}" data-id="{{ product._id }}"
+    data-name="{{ product.name|replace('\"', ' &quot;') }}"
+    data-amount="{% if product.owner_type == 'farmer' %}{{ (product.adjusted_price) | round(2) }}{% else %}{{ product.adjusted_price }}{% endif %}"
+    data-stock="{{ product.quantity or 100 }}" data-email="{{ session.get('user', '') }}"
+    data-user="{{ session.get('name', 'Customer')|replace('\"', ' &quot;') }}">
+</div>
+
+<script>
+    const configEl = document.getElementById('checkoutConfig');
+    const CONFIG = {
+        razorpayKey: configEl.dataset.key,
+        productId: configEl.dataset.id,
+        productName: configEl.dataset.name,
+        amount: parseFloat(configEl.dataset.amount || 0),
+        productStock: parseInt(configEl.dataset.stock || 0),
+        userEmail: configEl.dataset.email,
+        userName: configEl.dataset.user
+    };
+
+    console.log("KropKart Payment Config Loaded:", CONFIG);
+
+    function updateTotal() {
+        let qty = parseInt(document.getElementById('orderQty').value) || 1;
+        if (qty > CONFIG.productStock) {
+            alert(`Only ${CONFIG.productStock} units available in stock.`);
+            qty = CONFIG.productStock;
+            document.getElementById('orderQty').value = qty;
+        }
+        const finalTotal = (CONFIG.amount * qty).toFixed(2);
+        document.getElementById('displayQty').innerText = qty;
+        document.getElementById('finalTotal').innerText = '₹' + finalTotal;
+        return { qty, finalTotal };
+    }
+
+    const payButton = document.getElementById('payBtn');
+
+    if (payButton) {
+        payButton.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const btn = this;
+            const originalText = btn.innerHTML;
+
+            const { qty, finalTotal } = updateTotal();
+            const address = document.getElementById('deliveryAddress').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+
+            if (!address) {
+                alert("Please provide a delivery address for Shiprocket.");
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+            btn.disabled = true;
+
+            try {
+                if (typeof Razorpay === 'undefined') {
+                    throw new Error("Razorpay system failed to load. Please check your internet connection.");
+                }
+
+                // 1. Create Order with correct total amount
+                const orderRes = await fetch('/create_order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: parseFloat(finalTotal),
+                        quantity: qty
+                    })
+                });
+
+                if (!orderRes.ok) {
+                    const errorJson = await orderRes.json();
+                    throw new Error(errorJson.error || "Order creation failed");
+                }
+                const orderData = await orderRes.json();
+
+                // 2. Open Razorpay Modal
+                const options = {
+                    key: CONFIG.razorpayKey,
+                    amount: orderData.amount,
+                    currency: "INR",
+                    name: "KropKart",
+                    description: "Payment for " + qty + " units of " + CONFIG.productName,
+                    order_id: orderData.id,
+                    handler: async function (response) {
+                        btn.innerHTML = '<i class="fas fa-check-circle"></i> Verifying Delivery...';
+                        try {
+                            const verifyRes = await fetch('/verify_payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    product_id: CONFIG.productId,
+                                    amount: parseFloat(finalTotal),
+                                    quantity: qty,
+                                    address: address,
+                                    pincode: pincode,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+                            const result = await verifyRes.json();
+                            if (result.status === 'success') {
+                                alert("✅ Payment Successful! Shipment ID: " + (result.shipment_id || "Processing"));
+                                window.location.href = "/dashboard";
+                            } else {
+                                throw new Error(result.message || "Payment verification failed");
+                            }
+                        } catch (err) {
+                            alert("Verification error: " + err.message);
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    },
+                    prefill: {
+                        name: CONFIG.userName,
+                        email: CONFIG.userEmail
+                    },
+                    notes: {
+                        address: address,
+                        qty: qty
+                    },
+                    theme: { color: "#166534" },
+                    modal: {
+                        ondismiss: function () {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (err) {
+                console.error("Payment Error:", err);
+                alert("Error: " + err.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
+</script>
+{% endblock %}
